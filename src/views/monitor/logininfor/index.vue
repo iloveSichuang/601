@@ -162,7 +162,6 @@ export default {
   methods: {
     /** 查询登录日志列表 */
     getList() {
-      console.log(`output->111`)
       this.loading = true;
       list(this.addDateRange(this.queryParams, this.dateRange)).then(response => {
         console.log(`output->response`,response)
