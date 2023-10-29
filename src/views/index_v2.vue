@@ -1,0 +1,20 @@
+<template>
+  <h1>1</h1>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      
+    }
+  },
+  created(){
+    console.log(`output->index`)
+  }
+}
+</script>
+
+<style>
+
+</style>
