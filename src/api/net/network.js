@@ -38,12 +38,6 @@ export function getNetwork(id) {
 }
 
 
-export function getTags() {
-  return request({
-    url: "/get_netcats",
-    method: "get",
-  });
-}
 
 export function getDataset() {
   return request({
@@ -65,3 +59,11 @@ export function getOwnNetwork() {
     method: 'get'
   })
 }
+
+
+// export function getTags() {
+//   return request({
+//     url: "/get_netcats",
+//     method: "get",
+//   });
+// }

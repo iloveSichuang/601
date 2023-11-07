@@ -5,7 +5,7 @@
         <div class="head-container">
           <el-input
             v-model="searchInput"
-            placeholder="请输入名称或描述"
+            placeholder="请输入名称或创建人"
             clearable
             size="small"
             prefix-icon="el-icon-search"
@@ -15,12 +15,9 @@
         </div>
       </el-col>
       <el-col :span="4" :offset="16"
-        ><el-button
-          type="primary"
-          icon="el-icon-plus"
-          @click="handleSelect"
-          >查看个人网络</el-button
         >
+        <!-- <el-button type="primary" icon="el-icon-plus" @click="handleSelect"
+          >查看个人网络</el-button> -->
         <el-button
           type="primary"
           icon="el-icon-plus"
@@ -83,14 +80,23 @@
           label="模型功能"
           width="250"
           align="center"
-          :filters="tag1"
-          :filter-method="filterTag"
+          :filters="tags"
+          :filter-method="handlefilter"
           filter-placement="bottom-end"
         >
         </el-table-column>
         <el-table-column prop="type" label="模型类别" align="center">
         </el-table-column>
         <el-table-column prop="network_params" label="模型参数" align="center">
+        </el-table-column>
+        <el-table-column
+          prop="created_username"
+          label="创建人"
+          align="center"
+          :filters="creaters"
+          :filter-method="handlefilter"
+          filter-placement="bottom-end"
+        >
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
@@ -111,11 +117,8 @@
           </el-form-item>
           <el-form-item
             ><div>模型功能：</div>
-            <el-select
-              v-model="form.value"
-              placeholder="请选择"
-              @visible-change="getNetworkFunc"
-            >
+            <el-select v-model="form.value" placeholder="请选择">
+              <!-- @visible-change="getNetworkFunc" -->
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -193,8 +196,7 @@ import {
   getNetworkFunction,
   showNetworks,
   delNetwork,
-  getTags,
-  getOwnNetwork
+  getOwnNetwork,
 } from "@/api/net/network";
 export default {
   data() {
@@ -210,8 +212,11 @@ export default {
           label: "深度学习",
         },
       ],
-      // tag1: ['回归','信号处理'],
-      tags:[],
+      tags: [
+        { text: "回归", value: "回归" },
+        { text: "信号处理", value: "信号处理" },
+      ],
+      creaters: undefined,
       array: [1],
       ids: [],
       names: [],
@@ -239,14 +244,7 @@ export default {
     };
   },
   methods: {
-    handleSelect(){
-      getOwnNetwork().then(
-        res=>{
-          console.log(`output->res`,res)
-        }
-      )
-    },
-    handleTrain() {},
+    // handleTrain() {},
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
@@ -345,26 +343,23 @@ export default {
     getList() {
       this.loading = true;
       showNetworks().then((res) => {
-        // console.log(`output->res`, res);
+        // console.log(`output->res`,res)
         this.tableData = res;
-        this.searchData = res
+        this.searchData = res;
         this.loading = false;
-        this.getTags();
       });
     },
     getNetworkFunc() {
       getNetworkFunction().then((res) => {
         this.options = res;
+        this.tags = this.options.map((item) => ({
+          text: item.label,
+          value: item.label,
+        }));
       });
     },
-    filterTag(value, row) {
-      return row.category === value;
-    },
-    getTags() {
-      getTags().then((res) => {
-        console.log(`output->res`,res)
-        this.tags = res.data;
-      });
+    handlefilter(value, row, { property }) {
+      return row[property] === value;
     },
     searchExp(value) {
       this.searchData = this.filteredData;
@@ -373,12 +368,16 @@ export default {
   computed: {
     filteredData() {
       return this.tableData.filter((item) =>
-        item.name.toLowerCase().includes(this.searchInput.toLowerCase())
+        item.name.toLowerCase().includes(this.searchInput.toLowerCase()) || item.created_username.toLowerCase().includes(this.searchInput.toLowerCase())
       );
     },
   },
   created() {
     this.getList();
+    this.getNetworkFunc();
+    const name = this.$store.state.user.name;
+    this.creaters = [{ text: name, value: name }];
+    console.log(`output->this.creaters`, name);
   },
 };
 </script>
