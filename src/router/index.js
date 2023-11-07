@@ -74,6 +74,25 @@ export const constantRoutes = [
       }
     ]
   },
+  // {
+  //   path: '/dataset/sample/:id',
+  //   // name:'detaildata',
+  //   component: () => import('@/views/dataset/sample/detail')
+  // },
+  {
+    path: '/dataset/sample/detail',
+    component: Layout,
+    hidden: true,
+    // permissions: ['system:dict:list'],
+    children: [
+      {
+        path: ':id(\\d+)',
+        component: () => import('@/views/dataset/sample/detail'),
+        name: 'Detail',
+        meta: { title: '详细数据', activeMenu: '/dataset/sample' }
+      }
+    ]
+  },
   {
     path: '/user',
     component: Layout,

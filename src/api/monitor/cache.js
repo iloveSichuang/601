@@ -8,12 +8,7 @@ export function getCache() {
   })
 }
 
-export function getOccupancy() {
-  return request({
-    url: '/monitor/occupancy',
-    method: 'get'
-  })
-}
+
 
 
 // import request from '@/utils/request'
