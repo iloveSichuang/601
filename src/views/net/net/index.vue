@@ -14,8 +14,7 @@
           />
         </div>
       </el-col>
-      <el-col :span="4" :offset="16"
-        >
+      <el-col :span="4" :offset="16">
         <!-- <el-button type="primary" icon="el-icon-plus" @click="handleSelect"
           >查看个人网络</el-button> -->
         <el-button
@@ -155,9 +154,6 @@
               <el-button class="el-icon-upload2">模型文件上传</el-button>
             </el-upload>
           </el-form-item>
-          <!-- <el-form-item label="参数1" prop="param1">
-            <el-input v-model="form.desc"></el-input>
-          </el-form-item> -->
           <div v-for="(item, index) in array" :key="index">
             <el-form-item>
               <span>参数{{ index + 1 }}: </span>
@@ -367,8 +363,12 @@ export default {
   },
   computed: {
     filteredData() {
-      return this.tableData.filter((item) =>
-        item.name.toLowerCase().includes(this.searchInput.toLowerCase()) || item.created_username.toLowerCase().includes(this.searchInput.toLowerCase())
+      return this.tableData.filter(
+        (item) =>
+          item.name.toLowerCase().includes(this.searchInput.toLowerCase()) ||
+          item.created_username
+            .toLowerCase()
+            .includes(this.searchInput.toLowerCase())
       );
     },
   },

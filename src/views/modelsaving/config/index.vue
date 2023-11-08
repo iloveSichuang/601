@@ -443,12 +443,17 @@ export default {
         .then((res) => {
           if (res == "confirm") {
             this.$message.success("训练开始");
-            console.log(`output->row.id`, row.id);
+            // console.log(`output->row.id`, row.id);
+            row.status=2
             startTrain(row.id).then((res) => {
-              console.log(`output->kaishi`);
-              console.log(`output->res`, res);
+              // console.log(`output->res`, res);
               if (res.code == 200) {
+                this.$message.success(res.msg)
+                this.getList()
               }
+            }).catch(err=>{
+              row.status=3
+                this.$message.error('训练出错了')
             });
             //start
             var interval = setInterval(() => {
@@ -546,6 +551,7 @@ export default {
         // console.log(`output->res`, res);
         this.$message.success("修改成功");
         this.paramsDialogVisible = false;
+        this.getList()
       });
     },
     getImage(row) {
