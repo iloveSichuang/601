@@ -196,8 +196,8 @@ import {
   getNetworkFunction,
   showNetworks,
   delNetwork,
-  getOwnNetwork,
-} from "@/api/net/network";
+  // getOwnNetwork,
+} from "@/api/model/upload";
 export default {
   data() {
     return {
@@ -267,8 +267,8 @@ export default {
           return delNetwork(id);
         })
         .then(() => {
-          this.getList();
           this.$modal.msgSuccess("删除成功");
+          this.getList();
         })
         .catch(() => {});
     },
@@ -377,7 +377,7 @@ export default {
     this.getNetworkFunc();
     const name = this.$store.state.user.name;
     this.creaters = [{ text: name, value: name }];
-    console.log(`output->this.creaters`, name);
+    // console.log(`output->this.creaters`, name);
   },
 };
 </script>

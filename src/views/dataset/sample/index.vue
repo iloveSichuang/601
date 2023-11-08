@@ -5,11 +5,12 @@
         <div class="head-container">
           <el-input
             v-model="selectt"
-            placeholder="请输入名称或描述"
+            placeholder="请输入数据集名称"
             clearable
             size="small"
             prefix-icon="el-icon-search"
             style="margin-bottom: 20px"
+            @input="searchExp"
           />
         </div>
       </el-col>
@@ -32,7 +33,7 @@
         ></el-col
       >
       <el-table
-        :data="tableData"
+        :data="searchData"
         style="width: 100%"
         v-loading="loading"
         @selection-change="handleSelectionChange"
@@ -194,7 +195,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">提交</el-button>
-            <el-button>取消</el-button>
+            <el-button @click="event=>this.dialogVisible=false">取消</el-button>
           </el-form-item>
         </el-form>
       </el-dialog>
@@ -222,6 +223,7 @@ export default {
       sampleSetList: [],
       detailTable: [],
       dynamicTable: [],
+      searchData:[],
       loading: false,
       multiple: true,
       form: {
@@ -247,6 +249,9 @@ export default {
     // handleFileUpload(event){
     //   this.form.dataFile = event.target.files[0];
     // },
+    searchExp(value) {
+      this.searchData = this.filteredData;
+    },
     beforeRemove(file, fileList) {
       return this.$confirm(`确定移除 ${file.name}？`);
     },
@@ -285,6 +290,7 @@ export default {
             type: "success",
             message: "上传成功!",
           });
+          this.getList()
         } else {
           this.$message({
             type: "error",
@@ -297,8 +303,9 @@ export default {
       this.loading = true;
       getData().then((res) => {
         // console.log(`output->res`,res)
-        this.tableData = res;
-        this.loading = false;
+        this.tableData = res
+        this.searchData=res
+        this.loading = false
       });
     },
     getDetailed(el, id) {
@@ -327,7 +334,13 @@ export default {
       this.dynamicTable = columns;
     },
   },
-
+  computed: {
+    filteredData() {
+      return this.tableData.filter((item) =>
+        item.name.toLowerCase().includes(this.selectt.toLowerCase())
+      );
+    },
+  },
   created() {
     this.getList();
   },

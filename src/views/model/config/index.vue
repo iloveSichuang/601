@@ -5,7 +5,7 @@
         <div class="head-container">
           <el-input
             v-model="selectt"
-            placeholder="请输入名称或描述"
+            placeholder="请输入模型名称"
             clearable
             size="small"
             prefix-icon="el-icon-search"
@@ -84,7 +84,7 @@
             </el-tabs>
           </template>
         </el-table-column>
-        </el-table-column>
+
         <el-table-column
           prop="model_name"
           label="模型名字"
@@ -107,8 +107,7 @@
         <el-table-column
           prop="dataset"
           label="选择数据集"
-          align="center"
-        >
+          align="center">
         </el-table-column>
         
         <el-table-column label="状态" align="center"
@@ -247,7 +246,7 @@
       <el-dialog title="修改参数" :visible.sync="paramsDialogVisible" width="30%">
         <el-form ref="form" :model="modifyParams" :rules="rules" name="form">
           <el-card>
-            <template slot-scope="props">
+            <template>
             <div v-for="(v, k) in modifyParams">
               <el-form-item>
                 <span>{{ k }}: </span>
@@ -280,8 +279,7 @@ import {
   getListByCat,
   getNetwork,
   getDataset,
-} from "@/api/net/network";
-// import { getData } from "@/api/industry/sample-sets";
+} from "@/api/model/upload";
 export default {
   dicts: ["train_status"],
   data() {
@@ -443,12 +441,17 @@ export default {
         .then((res) => {
           if (res == "confirm") {
             this.$message.success("训练开始");
-            console.log(`output->row.id`, row.id);
+            // console.log(`output->row.id`, row.id);
+            row.status=2
             startTrain(row.id).then((res) => {
-              console.log(`output->kaishi`);
-              console.log(`output->res`, res);
+              // console.log(`output->res`, res);
               if (res.code == 200) {
+                this.$message.success(res.msg)
+                this.getList()
               }
+            }).catch(err=>{
+              row.status=3
+                this.$message.error('训练出错了')
             });
             //start
             var interval = setInterval(() => {
@@ -546,6 +549,7 @@ export default {
         // console.log(`output->res`, res);
         this.$message.success("修改成功");
         this.paramsDialogVisible = false;
+        this.getList()
       });
     },
     getImage(row) {
