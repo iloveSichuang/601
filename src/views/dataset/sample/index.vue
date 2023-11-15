@@ -60,10 +60,10 @@
                     样本集名称：{{ props.row.name }}
                   </el-form-item>
                   <el-form-item>
-                    样本集描述：{{ props.row.description }}
+                    样本集描述：{{ props.row.data_description }}
                   </el-form-item>
                   <el-form-item>
-                    样本集创建时间：{{ props.row.updateTime }}
+                    样本集创建时间：{{ props.row.upload_date }}
                   </el-form-item>
                 </el-form>
               </el-tab-pane>
@@ -95,21 +95,12 @@
                   style="width: 100%"
                 >
                   <el-table-column
-                    v-for="column in dynamicTable"
-                    :key="column.key"
-                    :prop="column.key"
-                    :label="column.label"
+                    v-for="(item, index) in dynamicTable"
+                    :key="index"
+                    :prop="item"
+                    :label="item"
+                    align="center"
                   ></el-table-column>
-                  <!-- <el-table-column
-                    prop="createtime"
-                    label="strtime"
-                    width="180"
-                  >
-                  </el-table-column>
-                  <el-table-column prop="name" label="intvalue" width="180">
-                  </el-table-column>
-                  <el-table-column prop="updateTime" label="intID">
-                  </el-table-column> -->
                 </el-table>
               </el-tab-pane>
             </el-tabs>
@@ -123,7 +114,7 @@
         >
         </el-table-column>
         <el-table-column
-          prop="description"
+          prop="data_description"
           label="样本集描述"
           width="250"
           align="center"
@@ -135,7 +126,7 @@
         </el-table-column> -->
         <el-table-column prop="createtime" label="创建时间" align="center">
           <template slot-scope="scope">
-            <span>{{ parseTime(scope.row.updateTime) }}</span>
+            <span>{{ parseTime(scope.row.upload_date) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
@@ -169,8 +160,11 @@
           <el-form-item label="样本集名称" prop="name">
             <el-input v-model="form.name"></el-input>
           </el-form-item>
-          <el-form-item label="样本集描述" prop="description">
-            <el-input type="textarea" v-model="form.description"></el-input>
+          <el-form-item label="样本集描述" prop="data_description">
+            <el-input
+              type="textarea"
+              v-model="form.data_description"
+            ></el-input>
           </el-form-item>
           <el-form-item label="样本集导入方式">
             <el-radio-group v-model="importmethod">
@@ -195,7 +189,9 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onSubmit">提交</el-button>
-            <el-button @click="event=>this.dialogVisible=false">取消</el-button>
+            <el-button @click="(event) => (this.dialogVisible = false)"
+              >取消</el-button
+            >
           </el-form-item>
         </el-form>
       </el-dialog>
@@ -205,14 +201,16 @@
 <script>
 import {
   postData,
-  getData,
+  getDataset,
   delById,
   getDetailData,
   getRowCol,
-} from "@/api/dataset/sample-sets";
+} from "@/api/dataset/dataset";
+import { at } from "lodash";
 export default {
   data() {
     return {
+      at,
       ids: [],
       names: [],
       importmethod: "",
@@ -223,12 +221,12 @@ export default {
       sampleSetList: [],
       detailTable: [],
       dynamicTable: [],
-      searchData:[],
+      searchData: [],
       loading: false,
       multiple: true,
       form: {
         name: "1",
-        description: "1",
+        data_description: "1",
         dataFile: undefined,
       },
       rules: {
@@ -246,9 +244,6 @@ export default {
     };
   },
   methods: {
-    // handleFileUpload(event){
-    //   this.form.dataFile = event.target.files[0];
-    // },
     searchExp(value) {
       this.searchData = this.filteredData;
     },
@@ -267,21 +262,23 @@ export default {
     handleDelete(row) {
       const id = row.id || this.ids;
       const name = row.name || this.names;
-      this.$modal.confirm('是否确认删除名为"' + name + '"的数据项？').then(function() {
-        return delById(id);
-      }).then(() => {
-        this.getList();
-        this.$modal.msgSuccess("删除成功");
-      }).catch(() => {});
+      this.$modal
+        .confirm('是否确认删除名为"' + name + '"的数据项？')
+        .then(function () {
+          return delById(id);
+        })
+        .then(() => {
+          this.getList();
+          this.$modal.msgSuccess("删除成功");
+        })
+        .catch(() => {});
     },
     onSubmit() {
-      // const s = new FormData()
-      // console.log(`output->s`,s)
       let formData = new FormData();
       formData.append("name", this.form.name);
-      formData.append("description", this.form.description);
-      formData.append("dataFile", this.form.dataFile);
-      // console.log(`output->this.form`,this.form)
+      formData.append("data_description", this.form.data_description);
+      formData.append("file", this.form.dataFile);
+      // console.log(`output->this.form`, this.form);
       postData(formData).then((res) => {
         // console.log(`output->res`,res)
         if (res == "success") {
@@ -290,7 +287,7 @@ export default {
             type: "success",
             message: "上传成功!",
           });
-          this.getList()
+          this.getList();
         } else {
           this.$message({
             type: "error",
@@ -301,37 +298,36 @@ export default {
     },
     getList() {
       this.loading = true;
-      getData().then((res) => {
+      getDataset().then((res) => {
         // console.log(`output->res`,res)
-        this.tableData = res
-        this.searchData=res
-        this.loading = false
+        this.tableData = res;
+        this.searchData = res;
+        this.loading = false;
       });
     },
     getDetailed(el, id) {
       if (el.index == 2) {
         getDetailData(id).then((res) => {
-          // console.log(`output->res`,res)
-          this.detailTable = res;
-          this.updateDynamicColumns();
-          this.detailTable = this.detailTable.map((item, index) => {
-            return { id: index + 1, ...item };
+          this.dynamicTable = res[0].map((e)=>{
+            return e.replace(/\./g, '_')
           });
+          this.detailTable = res.slice(1).map((item) => {
+            let obj = {};
+            this.dynamicTable.forEach((column, index) => {
+              obj[column] = item[index];
+            });
+            return obj;
+          });
+          console.log(`output->this.dynamicTable`,this.dynamicTable)
+          console.log(`output->this.detailTable`,this.detailTable)
         });
       } else if (el.index == 1) {
         getRowCol(id).then((res) => {
-          this.row = res[0];
-          this.col = res[1];
+          this.row = res.rows;
+          this.col = res.cols;
         });
       } else {
       }
-    },
-    updateDynamicColumns() {
-      const columns = Object.keys(this.detailTable[0]).map((key) => ({
-        key,
-        label: key,
-      }));
-      this.dynamicTable = columns;
     },
   },
   computed: {
@@ -350,7 +346,7 @@ export default {
 
 <style scoped>
 .el-tabs {
-  width: 50%;
+  width: 80%;
   margin: auto;
 }
 </style>

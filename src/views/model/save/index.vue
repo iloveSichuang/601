@@ -9,6 +9,10 @@ import {
   get
   // getListByCat,
 } from "@/api/model/save";
+import {
+  getDataset
+  // getListByCat,
+} from "@/api/dataset/dataset";
 export default {
   data() {
     return {
@@ -26,7 +30,11 @@ export default {
     }
   },
   created(){
-    
+    getDataset().then(
+      res=>{
+        console.log(`output->res`,res)
+      }
+    )
   }
 }
 </script>
