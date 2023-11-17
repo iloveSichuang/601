@@ -28,8 +28,9 @@
           :disabled="multiple"
           @click="handleDelete"
           >删除</el-button
-        ></el-col>
-      
+        ></el-col
+      >
+
       <el-table
         :data="searchData"
         style="width: 100%"
@@ -47,38 +48,64 @@
         </el-table-column>
         <el-table-column type="expand">
           <template slot-scope="props">
-            <el-tabs v-model="tab" :stretch="true" type="border-card" @tab-click="loadImage(props.row,tab)">
+            <el-tabs
+              v-model="tab"
+              :stretch="true"
+              type="border-card"
+              @tab-click="loadImage(props.row, tab)"
+            >
               <el-tab-pane label="详细信息" name="details">
-                <div style="display:flex">
-                  <el-form label-position="left" style="width:50%">
-                  <el-form-item label="模型名称:">
-                    <span>{{ props.row.model_name }}</span>
-                  </el-form-item>
-                  <el-form-item label="模型描述:">
-                    <span>{{ props.row.model_description }}</span>
-                  </el-form-item>
-                  <el-form-item label="模型类型:">
-                    <span>{{ props.row.network }}</span>
-                  </el-form-item>
-                  <el-form-item label="选择数据集:">
-                    <span>{{ props.row.dataset }}</span>
-                  </el-form-item>
-                </el-form>
-                <div style="margin-left:20%"><h1>训练进度：</h1><el-progress type="circle" :percentage="props.row.percentage" :status="props.row.process" :color="colors"></el-progress></div>
+                <div style="display: flex">
+                  <el-form label-position="left" style="width: 50%">
+                    <el-form-item label="模型名称:">
+                      <span>{{ props.row.model_name }}</span>
+                    </el-form-item>
+                    <el-form-item label="模型描述:">
+                      <span>{{ props.row.model_description }}</span>
+                    </el-form-item>
+                    <el-form-item label="模型类型:">
+                      <span>{{ props.row.network }}</span>
+                    </el-form-item>
+                    <el-form-item label="选择数据集:">
+                      <span>{{ props.row.dataset }}</span>
+                    </el-form-item>
+                  </el-form>
+                  <div style="margin-left: 20%">
+                    <h1>训练进度：</h1>
+                    <el-progress
+                      type="circle"
+                      :percentage="props.row.percentage"
+                      :status="props.row.process"
+                      :color="colors"
+                    ></el-progress>
+                  </div>
                 </div>
-                
+
                 <el-card shadow="always" class="box-card">
-                      <h1>
-                          <span>参数</span>
-                          <el-button style="float: right; padding: 3px 0" type="text" @click="handleModify(props.row)">修改参数</el-button>
-                        </h1>
-                        <div v-for="(v,k) in props.row.params" :key="k" class="text item">
-                          {{k +'  :  '+ v }}
-                        </div>
+                  <h1>
+                    <span>参数</span>
+                    <el-button
+                      style="float: right; padding: 3px 0"
+                      type="text"
+                      @click="handleModify(props.row)"
+                      >修改参数</el-button
+                    >
+                  </h1>
+                  <div
+                    v-for="(v, k) in props.row.params"
+                    :key="k"
+                    class="text item"
+                  >
+                    {{ k + "  :  " + v }}
+                  </div>
                 </el-card>
               </el-tab-pane>
               <el-tab-pane label="训练结果" name="result">
-                <img v-if="props.row.imagePath" :src="props.row.imagePath" alt="Image">
+                <img
+                  v-if="props.row.imagePath"
+                  :src="props.row.imagePath"
+                  alt="Image"
+                />
                 <h1 v-if="!props.row.imagePath">还未开始训练</h1>
               </el-tab-pane>
             </el-tabs>
@@ -98,26 +125,19 @@
           align="center"
         >
         </el-table-column>
-        <el-table-column
-          prop="network"
-          label="选择网络"
-          align="center"
-        >
+        <el-table-column prop="network" label="选择网络" align="center">
         </el-table-column>
-        <el-table-column
-          prop="dataset"
-          label="选择数据集"
-          align="center">
+        <el-table-column prop="dataset" label="选择数据集" align="center">
         </el-table-column>
-        
+
         <el-table-column label="状态" align="center"
           ><template slot-scope="scope">
             <dict-tag
-                      :options="dict.type.train_status"
-                      :value="scope.row.status"
-                    >
-                    </dict-tag>
-          </template></el-table-column>
+              :options="dict.type.train_status"
+              :value="scope.row.status"
+            >
+            </dict-tag> </template
+        ></el-table-column>
         <el-table-column label="训练" align="center"
           ><template slot-scope="scope">
             <el-button
@@ -126,8 +146,9 @@
               @click="viewRes(scope.row)"
               >查看训练结果</el-button
             >
-          </template></el-table-column>
-          <el-table-column label="操作" align="center">
+          </template></el-table-column
+        >
+        <el-table-column label="操作" align="center">
           <template slot-scope="scope">
             <el-button
               type="text"
@@ -145,12 +166,66 @@
               type="text"
               icon="el-icon-video-play"
               @click="handleTrain(scope.row)"
-              >开始训练</el-button>
-              
+              >开始训练</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
 
+      <el-dialog title="配置参数" :visible.sync="datasetVisible" width="30%">
+        <el-card>
+          <el-form ref="form" :model="form" :rules="rules" name="form">
+            <el-form-item label="输入模型名称:" prop="model_name">
+              <el-input v-model="form.model_name"></el-input>
+            </el-form-item>
+            <el-form-item label="输入模型描述:" prop="model_description">
+              <el-input v-model="form.model_description"></el-input>
+            </el-form-item>
+            <el-form-item label="选择模型类型:" prop="model_type">
+              <el-select
+                v-model="form.chosenmodeltype"
+                placeholder="请选择"
+                @change="showModel"
+              >
+                <el-option
+                  v-for="item in form.model_type"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="选择模型:" prop="model">
+              <el-select
+                v-model="form.chosenmodel"
+                placeholder="请选择"
+                @change="showParam"
+              >
+                <el-option
+                  v-for="item in form.model"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <div v-for="(v, k) in form.params">
+              <el-form-item>
+                <span>{{ v }}: </span>
+                <el-input
+                  style="width: 20%; margin-right: 10px"
+                  type="number"
+                  v-model="form.paramlist[k]"
+                ></el-input>
+              </el-form-item>
+            </div>
+            <el-button @click="onSubmit">提交</el-button>
+            <el-button @click="()=>{this.$store.state.dataset.visible=false}">取消</el-button>
+            </el-form>
+          </el-card>
+      </el-dialog>
       <el-dialog title="新建实验" :visible.sync="dialogVisible" width="30%">
         <el-steps :active="active" finish-status="success">
           <el-step title="输入模型功能"></el-step>
@@ -169,14 +244,30 @@
           </el-card>
 
           <el-card v-show="visible.card2">
-            <el-form-item label="选择数据集:" prop="dataset">
+            <el-form-item label="选择根数据集:" prop="dataset">
               <el-select
                 v-model="form.chosendataset"
                 placeholder="请选择"
-                @change="getDataset"
+                @change="getChildDataset"
               >
                 <el-option
                   v-for="item in form.dataset"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                >
+                </el-option>
+              </el-select>
+            </el-form-item>
+
+            <el-form-item label="选择自定义数据集:" prop="childDataset">
+              <el-select
+                v-model="form.chosenChildDataset"
+                placeholder="请选择"
+                @change=""
+              >
+                <el-option
+                  v-for="item in form.childDataset"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
@@ -242,25 +333,30 @@
         </el-form>
       </el-dialog>
 
-
-      <el-dialog title="修改参数" :visible.sync="paramsDialogVisible" width="30%">
+      <el-dialog
+        title="修改参数"
+        :visible.sync="paramsDialogVisible"
+        width="30%"
+      >
         <el-form ref="form" :model="modifyParams" :rules="rules" name="form">
           <el-card>
             <template>
-            <div v-for="(v, k) in modifyParams">
-              <el-form-item>
-                <span>{{ k }}: </span>
-                <el-input
-                  style="width: 20%; margin-right: 10px"
-                  type="number"
-                  v-model="modifyParams[k]"
-                ></el-input>
-              </el-form-item>
-            </div>
+              <div v-for="(v, k) in modifyParams">
+                <el-form-item>
+                  <span>{{ k }}: </span>
+                  <el-input
+                    style="width: 20%; margin-right: 10px"
+                    type="number"
+                    v-model="modifyParams[k]"
+                  ></el-input>
+                </el-form-item>
+              </div>
             </template>
           </el-card>
         </el-form>
-        <el-button style="margin-top:30px" @click="onModifySubmit">提交</el-button>
+        <el-button style="margin-top: 30px" @click="onModifySubmit"
+          >提交</el-button
+        >
       </el-dialog>
     </el-row>
   </div>
@@ -279,6 +375,7 @@ import {
   getListByCat,
   getNetwork,
   getDataset,
+  getChildDataset,
 } from "@/api/model/upload";
 export default {
   dicts: ["train_status"],
@@ -312,9 +409,11 @@ export default {
         model_name: "CNN",
         model_description: "chenhai",
         dataset: [],
+        childDataset: [],
         chosenmodeltype: "回归",
         chosenmodel: "",
         chosendataset: "test2",
+        chosenChildDataset: "",
         params: [],
         chosenParams: [],
         paramlist: [],
@@ -409,15 +508,17 @@ export default {
     },
     getDataset() {
       getDataset().then((res) => {
-        // console.log(`output->res`, res);
-
         this.form.dataset = this.handleModelList(res);
-        // console.log(`output->`,this.form.dataset)
+      });
+    },
+    getChildDataset() {
+      getChildDataset(this.form.chosendataset).then((res) => {
+        this.form.childDataset = this.handleModelList(res);
       });
     },
     show() {
       getNetworkFunction().then((res) => {
-        console.log(`output->res`, res);
+        // console.log(`output->res`, res);
         this.form.model_type = res;
         // getListByCat(id).then(res=>{
         //   console.log(`output->res`,res)
@@ -427,7 +528,6 @@ export default {
     searchExp(value) {
       this.searchData = this.filteredData;
     },
-
     getModelParamPlus() {
       this.next();
       this.getDataset();
@@ -442,17 +542,19 @@ export default {
           if (res == "confirm") {
             this.$message.success("训练开始");
             // console.log(`output->row.id`, row.id);
-            row.status=2
-            startTrain(row.id).then((res) => {
-              // console.log(`output->res`, res);
-              if (res.code == 200) {
-                this.$message.success(res.msg)
-                this.getList()
-              }
-            }).catch(err=>{
-              row.status=3
-                this.$message.error('训练出错了')
-            });
+            row.status = 2;
+            startTrain(row.id)
+              .then((res) => {
+                // console.log(`output->res`, res);
+                if (res.code == 200) {
+                  this.$message.success(res.msg);
+                  this.getList();
+                }
+              })
+              .catch((err) => {
+                row.status = 3;
+                this.$message.error("训练出错了");
+              });
             //start
             var interval = setInterval(() => {
               row.percentage += 1;
@@ -496,51 +598,30 @@ export default {
       this.paramsDialogVisible = true;
     },
     onSubmit() {
-      var postform = { ...this.form.paramlist };
-      postform.model_name = this.form.model_name;
-      postform.model_description = this.form.model_description;
-      postform.dataset = this.form.chosendataset;
-      postform.model_type = this.form.chosenmodeltype;
-      postform.network_id = this.form.chosenmodel;
-      // // for (const k in this.form.paramlist){
-      // //   console.log(`output->k`,k)
-      // //   console.log(`output->this.form.chosenParams[k]`,this.form.chosenParams[k])
-      // // }
-      // for (const [key, value] of Object.entries(this.form.params)) {
-      //   // if (key == name) {
-      //   //   this.form.chosenParams = key;
-      //   //   break;
-      //   // }
-      //   this.form.chosenParams = key;
-      //   // console.log(`output->key`,key)
-
-      // }
-      // console.log(`output->`, this.form.chosenParams);
-      // console.log(`output->this.form.paramlist`,this.form.paramlist)
-      // for (const k in this.form.paramlist) {
-      //   Object.defineProperty(postform, this.form.chosenParams[k], {
-      //     // value: this.form.paramlist[k],
-      //     value:1,
-      //     enumerable: true,
-      //   });
-      // }
-      console.log(`output->postform`, postform);
-      uploadModel(postform).then((res) => {
-        // console.log(`output->res`, res);
-        if (res == "添加成功") {
-          this.dialogVisible = false;
-          this.$message({
-            type: "success",
-            message: "上传成功!",
-          });
-        } else {
-          this.$message({
-            type: "error",
-            message: "上传失败!",
-          });
-        }
-      });
-      this.getList();
+      console.log(`output->this.$re`,this.$refs.form)
+      // var postform = { ...this.form.paramlist };
+      // postform.model_name = this.form.model_name;
+      // postform.model_description = this.form.model_description;
+      // postform.dataset = this.form.chosenChildDataset;
+      // postform.model_type = this.form.chosenmodeltype;
+      // postform.network_id = this.form.chosenmodel;
+      // console.log(`output->postform`, postform);
+      // uploadModel(postform).then((res) => {
+      //   // console.log(`output->res`, res);
+      //   if (res == "添加成功") {
+      //     this.dialogVisible = false;
+      //     this.$message({
+      //       type: "success",
+      //       message: "上传成功!",
+      //     });
+      //   } else {
+      //     this.$message({
+      //       type: "error",
+      //       message: "上传失败!",
+      //     });
+      //   }
+      // });
+      // this.getList();
     },
     onModifySubmit() {
       // console.log(`output->this.modifyId`, this.modifyId);
@@ -549,7 +630,7 @@ export default {
         // console.log(`output->res`, res);
         this.$message.success("修改成功");
         this.paramsDialogVisible = false;
-        this.getList()
+        this.getList();
       });
     },
     getImage(row) {
@@ -576,7 +657,7 @@ export default {
         // console.log(`output->res`,res)
         this.tableData = res;
         this.searchData = res;
-        this.loading=false
+        this.loading = false;
       });
     },
   },
@@ -586,8 +667,17 @@ export default {
         item.model_name.toLowerCase().includes(this.selectt.toLowerCase())
       );
     },
+    datasetVisible: {
+      get() {
+        return this.$store.state.dataset.visible;
+      },
+      set(value) {
+        this.$store.state.dataset.visible = value;
+      },
+    },
   },
   created() {
+    // console.log(`output->this`, this.$store.state.dataset.visible);
     this.getList();
   },
 };

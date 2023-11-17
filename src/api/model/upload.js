@@ -38,13 +38,20 @@ export function getNetwork(id) {
 }
 
 
-
 export function getDataset() {
   return request({
     url: "/get_datasets",
     method: "get",
   });
 }
+
+export function getChildDataset(id) {
+  return request({
+    url: "/get_TestData_ById/" + id,
+    method: "get"
+  });
+}
+
 
 export function delNetwork(id) {
   return request({

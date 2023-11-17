@@ -57,6 +57,7 @@
       style="width: 100%; margin-top: 20px"
       @selection-change="handleRowSelectionChange"
       :row-style="rowClass"
+      v-loading="loading"
     >
       <el-table-column
         prop="select"
@@ -83,6 +84,7 @@ export default {
   data() {
     return {
       // /csv/list
+      loading:undefined,
       strrow: "ALL",
       stri: "",
       stro: "",
@@ -100,9 +102,14 @@ export default {
     getList() {
       getDetailData(this.$route.params.id).then((res) => {
         // console.log(`output->res`,res)
+        this.dynamicTable = res[0].map((e) => {
+          return e.replace(/\./g, "_");
+        });
+        // console.log(`output->this.dynamicTable`, this.dynamicTable);
+        
         this.detailTable = res.slice(1).map((item) => {
           let obj = {};
-          res[0].forEach((column, index) => {
+          this.dynamicTable.forEach((column, index) => {
             obj[column] = item[index];
           });
           return obj;
@@ -111,10 +118,6 @@ export default {
           return { id: index + 1, ...item };
         });
         // console.log(`output->this.detailTable`,this.detailTable)
-        this.dynamicTable = res[0].map((e) => {
-          return e.replace(/\./g, "_");
-        });
-        // console.log(`output->this.dynamicTable`, this.dynamicTable);
         this.dynamicTable = this.dynamicTable.map((element) => {
           return {
             key: element,
@@ -122,6 +125,7 @@ export default {
             isCheck: false,
           };
         });
+        this.loading=false
       });
     },
     handleRowSelectionChange(selection) {
@@ -190,6 +194,8 @@ export default {
     selectOutput() {
       const arr2 = this.selectColumns.slice();
       this.selectOut = arr2;
+      this.dynamicTable.map((item) => (item.isCheck = false));
+      this.selectColumns = [];
       this.stro = this.arr2str(arr2);
     },
     renderHeader(h, { column, $index }) {
@@ -233,6 +239,7 @@ export default {
     },
   },
   mounted() {
+    this.loading=true
     this.getList();
   },
 };

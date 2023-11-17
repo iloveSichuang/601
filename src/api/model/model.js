@@ -18,11 +18,13 @@ export function uploadModel(data) {
 
 export function startTrain(id) {
   return request({
-    url: "/train_model/" + id,
+    url: "/train_model2/" + id,
     method: "get",
     timeout: 100000
   });
 }
+
+
 
 export function getTrainStatus(id) {
   return request({
@@ -54,6 +56,8 @@ export function getPic(image_name) {
     responseType: 'blob'
   });
 }
+
+
 
 // export function searchModelByIdesc(q) {
 //   return request({

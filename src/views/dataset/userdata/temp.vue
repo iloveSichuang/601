@@ -14,14 +14,14 @@
           />
         </div>
       </el-col>
-      <el-col :span="4" :offset="16">
-        <!-- <el-button
+      <el-col :span="4" :offset="16"
+        ><el-button
           type="primary"
           icon="el-icon-plus"
           size="mini"
           @click="dialogVisible = true"
           >新建样本集</el-button
-        > -->
+        >
         <el-button
           type="info"
           plain
@@ -45,7 +45,7 @@
           align="center"
         >
         </el-table-column>
-        <!-- <el-table-column type="expand">
+        <el-table-column type="expand">
           <template slot-scope="props">
             <el-tabs
               type="border-card"
@@ -60,10 +60,10 @@
                     样本集名称：{{ props.row.name }}
                   </el-form-item>
                   <el-form-item>
-                    根样本集：{{ props.row.origin_dataset }}
+                    样本集描述：{{ props.row.data_description }}
                   </el-form-item>
                   <el-form-item>
-                    样本集创建时间：{{ props.row.create_date }}
+                    样本集创建时间：{{ props.row.upload_date }}
                   </el-form-item>
                 </el-form>
               </el-tab-pane>
@@ -105,7 +105,7 @@
               </el-tab-pane>
             </el-tabs>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column
           prop="name"
           label="样本集名称"
@@ -114,33 +114,19 @@
         >
         </el-table-column>
         <el-table-column
-          prop="origin_dataset"
-          label="根样本集"
+          prop="data_description"
+          label="样本集描述"
           width="250"
           align="center"
         >
         </el-table-column>
-        <el-table-column prop="create_date" label="创建时间" align="center">
+        <el-table-column prop="createtime" label="创建时间" align="center">
           <template slot-scope="scope">
-            <span>{{ scope.row.create_date }}</span>
+            <span>{{ parseTime(scope.row.upload_date) }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" align="center">
           <template slot-scope="scope">
-            <!-- <router-link
-                      :to="`/model/config`"
-                      class="link-type"
-                    >
-                      <el-button type="text"
-              icon="el-icon-video-play">配置参数训练</el-button>
-            </router-link> -->
-            <el-button
-              type="text"
-              icon="el-icon-video-play"
-              @click="handleTrain(scope.row)"
-              >配置参数训练</el-button
-            >
-            &nbsp
             <el-button
               type="text"
               icon="el-icon-delete"
@@ -151,7 +137,7 @@
         </el-table-column>
       </el-table>
 
-      <!-- <el-dialog title="新建样本集" :visible.sync="dialogVisible" width="30%">
+      <el-dialog title="新建样本集" :visible.sync="dialogVisible" width="30%">
         <el-form ref="form" :model="form" :rules="rules" name="form">
           <el-form-item label="样本集名称" prop="name">
             <el-input v-model="form.name"></el-input>
@@ -170,12 +156,11 @@
             >
           </el-form-item>
         </el-form>
-      </el-dialog> -->
+      </el-dialog>
     </el-row>
   </div>
 </template>
 <script>
-import { getUserData, delById } from "@/api/dataset/userdata";
 export default {
   data() {
     return {
@@ -205,10 +190,6 @@ export default {
     searchExp(value) {
       this.searchData = this.filteredData;
     },
-    handleTrain({id}) {
-      this.$store.state.dataset.visible=true
-      this.$router.push({path:'/model/config',params: {id:id}})
-    },
     handleDelete(row) {
       const id = row.id || this.ids;
       const name = row.name || this.names;
@@ -230,15 +211,16 @@ export default {
       this.multiple = !selection.length;
     },
     onSubmit() {},
-    getList() {
+    getList(){
       this.loading = true;
-      getUserData().then((res) => {
+      getDataset().then((res) => {
         // console.log(`output->res`,res)
         this.tableData = res;
         this.searchData = res;
         this.loading = false;
       });
-    },
+
+    }
   },
   computed: {
     filteredData() {
@@ -247,7 +229,6 @@ export default {
       );
     },
   },
-
   created() {
     this.getList();
   },

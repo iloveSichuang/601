@@ -120,10 +120,6 @@
           align="center"
         >
         </el-table-column>
-        <!-- <el-table-column prop="rownum" label="行数" align="center">
-        </el-table-column>
-        <el-table-column prop="colnum" label="列数" align="center">
-        </el-table-column> -->
         <el-table-column prop="createtime" label="创建时间" align="center">
           <template slot-scope="scope">
             <span>{{ parseTime(scope.row.upload_date) }}</span>
@@ -318,8 +314,8 @@ export default {
             });
             return obj;
           });
-          console.log(`output->this.dynamicTable`,this.dynamicTable)
-          console.log(`output->this.detailTable`,this.detailTable)
+          // console.log(`output->this.dynamicTable`,this.dynamicTable)
+          // console.log(`output->this.detailTable`,this.detailTable)
         });
       } else if (el.index == 1) {
         getRowCol(id).then((res) => {
