@@ -84,7 +84,9 @@
           filter-placement="bottom-end"
         >
         </el-table-column>
-        <el-table-column prop="type" label="模型类别" align="center">
+        <el-table-column prop="type" label="模型类别" align="center" :filters="model_type_filt"
+          :filter-method="handlefilter"
+          filter-placement="bottom-end">
         </el-table-column>
         <el-table-column prop="network_params" label="模型参数" align="center">
         </el-table-column>
@@ -208,10 +210,21 @@ export default {
           label: "深度学习",
         },
       ],
+      model_type_filt:[
+        {
+          value: "机器学习",
+          text: "机器学习",
+        },
+        {
+          value: "深度学习",
+          text: "深度学习",
+        },
+      ],
       tags: [
         { text: "回归", value: "回归" },
         { text: "信号处理", value: "信号处理" },
       ],
+
       creaters: undefined,
       array: [1],
       ids: [],

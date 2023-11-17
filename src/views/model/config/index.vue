@@ -18,7 +18,7 @@
         ><el-button
           type="primary"
           icon="el-icon-plus"
-          @click="dialogVisible = true"
+          @click="dialogVisible = true;"
           >新建实验</el-button
         >
         <el-button
@@ -222,10 +222,14 @@
               </el-form-item>
             </div>
             <el-button @click="onSubmit">提交</el-button>
-            <el-button @click="()=>{this.$store.state.dataset.visible=false}">取消</el-button>
-            </el-form>
-          </el-card>
+            <el-button
+              @click="datasetVisible=false"
+              >取消</el-button
+            >
+          </el-form>
+        </el-card>
       </el-dialog>
+
       <el-dialog title="新建实验" :visible.sync="dialogVisible" width="30%">
         <el-steps :active="active" finish-status="success">
           <el-step title="输入模型功能"></el-step>
@@ -428,6 +432,7 @@ export default {
         ],
       },
       dialogVisible: false,
+      datasetVisible:false,
       paramsDialogVisible: false,
       selectt: "",
       tableData: [],
@@ -518,7 +523,7 @@ export default {
     },
     show() {
       getNetworkFunction().then((res) => {
-        // console.log(`output->res`, res);
+        console.log(`output->res`, res);
         this.form.model_type = res;
         // getListByCat(id).then(res=>{
         //   console.log(`output->res`,res)
@@ -598,30 +603,30 @@ export default {
       this.paramsDialogVisible = true;
     },
     onSubmit() {
-      console.log(`output->this.$re`,this.$refs.form)
-      // var postform = { ...this.form.paramlist };
-      // postform.model_name = this.form.model_name;
-      // postform.model_description = this.form.model_description;
-      // postform.dataset = this.form.chosenChildDataset;
-      // postform.model_type = this.form.chosenmodeltype;
-      // postform.network_id = this.form.chosenmodel;
+      var postform = { ...this.form.paramlist };
+      postform.model_name = this.form.model_name;
+      postform.model_description = this.form.model_description;
+      postform.dataset = this.form.chosenChildDataset;
+      postform.model_type = this.form.chosenmodeltype;
+      postform.network_id = this.form.chosenmodel;
       // console.log(`output->postform`, postform);
-      // uploadModel(postform).then((res) => {
-      //   // console.log(`output->res`, res);
-      //   if (res == "添加成功") {
-      //     this.dialogVisible = false;
-      //     this.$message({
-      //       type: "success",
-      //       message: "上传成功!",
-      //     });
-      //   } else {
-      //     this.$message({
-      //       type: "error",
-      //       message: "上传失败!",
-      //     });
-      //   }
-      // });
-      // this.getList();
+      uploadModel(postform).then((res) => {
+        // console.log(`output->res`, res);
+        if (res == "添加成功") {
+          this.dialogVisible = false
+          this.datasetVisible = false
+          this.$message({
+            type: "success",
+            message: "上传成功!",
+          });
+        } else {
+          this.$message({
+            type: "error",
+            message: "上传失败!",
+          });
+        }
+      });
+      this.getList();
     },
     onModifySubmit() {
       // console.log(`output->this.modifyId`, this.modifyId);
@@ -638,7 +643,7 @@ export default {
         .then((response) => {
           // console.log(`output->res`,response)
           const imageUrl = URL.createObjectURL(response);
-          console.log(`output->imageUrl`, imageUrl);
+          // console.log(`output->imageUrl`, imageUrl);
           row.imagePath = imageUrl;
         })
         .catch((error) => {
@@ -660,6 +665,7 @@ export default {
         this.loading = false;
       });
     },
+    
   },
   computed: {
     filteredData() {
@@ -667,16 +673,22 @@ export default {
         item.model_name.toLowerCase().includes(this.selectt.toLowerCase())
       );
     },
-    datasetVisible: {
-      get() {
-        return this.$store.state.dataset.visible;
-      },
-      set(value) {
-        this.$store.state.dataset.visible = value;
-      },
-    },
+    // datasetVisible: {
+    //   get() {
+    //     return this.$store.state.dataset.visible;
+    //   },
+    //   set(value) {
+    //     this.$store.state.dataset.visible = value;
+    //   },
+    // },
   },
   created() {
+    // console.log(`output->h`,this.$route.query)
+    if(this.$route.query.id){
+      this.datasetVisible = true;
+      this.form.chosenChildDataset = this.$route.query.id
+      this.show()
+    }
     // console.log(`output->this`, this.$store.state.dataset.visible);
     this.getList();
   },

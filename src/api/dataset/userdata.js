@@ -7,10 +7,17 @@ export function getUserData() {
     });
 }
 
+export function showUserData(id) {
+    return request({
+        url: "get_userdata_info/"+id,
+        method: "get",
+    });
+}
+
 
 export function delById(id) {
     return request({
-        url: 'delete_testdata/' + id,
+        url: 'delete_userdata/' + id,
         method: 'delete'
     })
 }

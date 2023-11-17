@@ -37,6 +37,7 @@
         style="width: 100%"
         v-loading="loading"
         @selection-change="handleSelectionChange"
+        @expand-change="handleExpandChange"
       >
         <el-table-column
           prop="select"
@@ -45,67 +46,42 @@
           align="center"
         >
         </el-table-column>
-        <!-- <el-table-column type="expand">
+        <el-table-column type="expand">
           <template slot-scope="props">
-            <el-tabs
-              type="border-card"
-              @tab-click="getDetailed($event, props.row.id)"
-              value="first"
-              :stretch="true"
+            <span style="margin-left: 500px"
+              >仅展示前
+              <el-input
+                style="width: 80px"
+                type="number"
+                v-model="showNum"
+              ></el-input>
+              条数据</span
             >
-              <el-tab-pane label="基础信息" name="first">
-                表基础信息
-                <el-form>
-                  <el-form-item>
-                    样本集名称：{{ props.row.name }}
-                  </el-form-item>
-                  <el-form-item>
-                    根样本集：{{ props.row.origin_dataset }}
-                  </el-form-item>
-                  <el-form-item>
-                    样本集创建时间：{{ props.row.create_date }}
-                  </el-form-item>
-                </el-form>
-              </el-tab-pane>
-              <el-tab-pane label="表结构" name="second">
-                <h1>该表有{{ row }}行,{{ col }}列</h1>
-              </el-tab-pane>
-              <el-tab-pane label="样例数据" name="third">
-                <div style="display: flex; justify-content: space-around">
-                  <span
-                    >仅展示前
-                    <el-input
-                      style="width: 80px"
-                      type="number"
-                      v-model="showNum"
-                    ></el-input>
-                    条数据</span
-                  >
-                  <div>
-                    <router-link
-                      :to="`/dataset/sample/detail/${props.row.id}`"
-                      class="link-type"
-                    >
-                      <el-button>选择参与训练数据</el-button>
-                    </router-link>
-                  </div>
-                </div>
-                <el-table
-                  :data="detailTable.slice(0, showNum)"
-                  style="width: 100%"
-                >
-                  <el-table-column
-                    v-for="(item, index) in dynamicTable"
-                    :key="index"
-                    :prop="item"
-                    :label="item"
-                    align="center"
-                  ></el-table-column>
-                </el-table>
-              </el-tab-pane>
-            </el-tabs>
+            <el-table
+              :data="detailTable.slice(0, showNum)"
+              style="width: 100%; margin-top: 10px"
+            >
+              <el-table-column label="输入参数" align="center"
+                ><el-table-column
+                  v-for="(item, index) in inDynamicTable"
+                  :key="index"
+                  :prop="item"
+                  :label="item"
+                  align="center"
+                ></el-table-column
+              ></el-table-column>
+              <el-table-column label="输出参数" align="center"
+                ><el-table-column
+                  v-for="(item, index) in outDynamicTable"
+                  :key="index"
+                  :prop="item"
+                  :label="item"
+                  align="center"
+                ></el-table-column
+              ></el-table-column>
+            </el-table>
           </template>
-        </el-table-column> -->
+        </el-table-column>
         <el-table-column
           prop="name"
           label="样本集名称"
@@ -175,7 +151,7 @@
   </div>
 </template>
 <script>
-import { getUserData, delById } from "@/api/dataset/userdata";
+import { getUserData, delById, showUserData } from "@/api/dataset/userdata";
 export default {
   data() {
     return {
@@ -186,6 +162,10 @@ export default {
       dialogVisible: false,
       searchData: [],
       tableData: [],
+      detailTable: [],
+      inDynamicTable: [],
+      outDynamicTable: [],
+      showNum: 20,
       form: {
         name: "1",
         data_description: "1",
@@ -205,9 +185,21 @@ export default {
     searchExp(value) {
       this.searchData = this.filteredData;
     },
-    handleTrain({id}) {
-      this.$store.state.dataset.visible=true
-      this.$router.push({path:'/model/config',params: {id:id}})
+    handleExpandChange({ id }, { length }) {
+      if (length == 1) {
+        showUserData(id).then((res) => {
+          this.inDynamicTable = Object.keys(res.input[0]);
+          this.outDynamicTable = Object.keys(res.output[0]);
+          this.detailTable = res.input.map((item, index) => {
+            return { ...item, ...res.output[index] };
+          });
+          // console.log(`output->this.detailTable`, this.detailTable);
+        });
+      }
+    },
+    handleTrain({ id }) {
+      // console.log(`output->id`, id);
+      this.$router.push({ path: "/model/config", query: { id } });
     },
     handleDelete(row) {
       const id = row.id || this.ids;
